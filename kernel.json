@@ -1,0 +1,6 @@
+{
+ "argv": ["python3", "-m", "spm_kernel",
+          "-f", "{connection_file}"],
+ "display_name": "SPM",
+ "language": "SPM"
+}
