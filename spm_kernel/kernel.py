@@ -32,16 +32,16 @@ class SPMKernel(ProcessMetaKernel):
   implementation = 'SPM Kernel'
   implementation_version = __version__
   language = 'SPM'
-  language_version = '8.3'
+  language_version = '8.0'
   language_info = {'name': 'SPM',
                    'codemirror_mode': 'shell',
-                   'mimetype': 'text/x-sh',
+                   'mimetype': 'text/plain',
                    'file_extension': '.cmd'}
   kernel_json = {"argv": ["python3", "-m", "spm_kernel",
                           "-f", "{connection_file}"],
                  "display_name": "SPM",
-                 "language": "SPM"}
-  
+                 "language": "SPM",
+                 "name": "SPM"}
   _first = True
   inline_plotting = True
 
