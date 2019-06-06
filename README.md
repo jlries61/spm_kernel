@@ -1,5 +1,5 @@
 # spm_kernel
-Jupyter kernel for Salford Predictive Miner (SPM)
+Jupyter kernel for Salford Predictive Modeler (SPM)
 
 The SPM kernel provides a way to conduct analyses in SPM from the comfort of
 one's own web browser.
