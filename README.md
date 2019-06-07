@@ -20,6 +20,11 @@ one's own web browser.
   part of most Linux distributions, so if you plan to run under Linux,
   you can probably use your distribution's package manager to install
   Python 3 if it is not installed already.
+  
+* Prerequisite Python packages.  These will be installed automatically
+  when you install spm-kernel, but you'll probably want to install them
+  at the system level instead of the user level if you can.  The list
+  includes `IPython`, `pexpect`, `xmltodict`, `numpy`, `pandas`, and `matplotlib`.
 
 * Jupyter (<https://jupyter.org/>).
 
