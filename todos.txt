@@ -1,0 +1,12 @@
+* Properly render two-way partial dependency plots and make them optional.
+
+* Improved GUI displays for main results.
+    Dan: I would like to see a graphic much like the one we produce for TN in
+    SPM when the model first completes -- the performance curve vs number of
+    tree. Also a nice display showing the main performance results ( for
+    classification -- Loglike ROC Misclass Lift in an attractive table.
+    This all automatic.
+
+* In summaries of shaving batteries, give numbers of predictors shaved instead
+  of names when the number is greater than a specified value (perhaps 5 by
+  default).  The number would be an option on the $AUTOSUM command.
