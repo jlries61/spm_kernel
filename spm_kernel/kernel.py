@@ -110,10 +110,12 @@ class SPMKernel(ProcessMetaKernel):
 
   # Generic function to extract the specified SPM text table from input,
   # format it as an HTML table and display it inside of Jupyter.
-  def display_table(self, input, pattern):
+  def display_table(self, input, pattern, nvar_show = 5):
     # input is a multiline text string containing SPM classic output,
     #   hopefully including the desired table.
     # pattern is the regular expression the table header needs to match.
+    # nvar_show is the maximum number of variable names to display in a table cell
+    #   If more are found, then only the number is given.
     found = False               # Set to True when table is found
     inline = input.splitlines() # Split input into an array of lines to facilitate parsing
     iline = 0                   # Line index
@@ -215,7 +217,13 @@ class SPMKernel(ProcessMetaKernel):
       line = table[iline]
       cell=[]
       for icol in range(ncol):
-        cell.append(line[startcol[icol]:endcol[icol]])
+        current_col = line[startcol[icol]:endcol[icol]]
+        if ", " in current_col:
+          varlist = current_col.rsplit(", ")
+          nvar = len(varlist)
+          if nvar > nvar_show:
+            current_col = str(nvar) + " variables"
+        cell.append(current_col)
       body.append(cell)
 
     # Parse the table footer, if any, into individual cells
@@ -379,6 +387,7 @@ class SPMKernel(ProcessMetaKernel):
     global __echo__       # We're using the global version of __echo__
     translate = False     # Set to True if handling a translation
     auto_summary = False  # Set to True if processing an $AUTOSUM statement
+    nvar_show = 5         # Maximum number of predictor variables to list for a given shave step
 
     # Handle plot settings first time through
     if self._first:
@@ -479,7 +488,7 @@ class SPMKernel(ProcessMetaKernel):
       if "*ERROR*" not in output:
         with open(tmpname) as fd:
           trans = fd.read()
-        if self.display_table(trans, "Automate Summary$"):
+        if self.display_table(trans, "Automate Summary$", nvar_show = nvar_show):
           output = ""
         else:
           output = "Automate summary table not present.  Did you run an AUTOMATE?"
