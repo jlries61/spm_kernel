@@ -9,3 +9,6 @@
   summary
 
 * Properly render two-way partial dependency plots and make them optional.
+
+* On AUTOMATE ADDITIVE, AUTOMATE STEPWISE, and AUTOMATE SHAVING ERROR,
+  include the progress reports with the summary tables.
