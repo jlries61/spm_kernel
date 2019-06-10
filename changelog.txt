@@ -1,0 +1,5 @@
+1.0.1: In AUTOMATE summary tables, if more than five variable names are listed
+       in a cell, then replace the names with a count of the number of
+       variables.
+
+1.0.0: Initial release
