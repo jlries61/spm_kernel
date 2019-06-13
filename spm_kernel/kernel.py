@@ -43,10 +43,10 @@ __echo__ = True    # Send SPM console output to Jupyter.
 # I'll confess that I copied this from gnuplot_kernel (my initial model)
 # and don't know exactly what it does.
 try:
-    FileNotFoundError
+  FileNotFoundError
 except NameError:
-    # Python 2
-    FileNotFoundError = OSError
+  # Python 2
+  FileNotFoundError = OSError
 
 class SPMKernel(ProcessMetaKernel):
   implementation = 'SPM Kernel'
@@ -377,6 +377,42 @@ class SPMKernel(ProcessMetaKernel):
         plt.ylabel("Partial Dependency")
         self.display_figure(fig)
 
+  def display_sequence(self, input):
+    modtype = ""
+    output = ""
+    if "TreeNet Results" in input:
+      modtype = "TreeNet"
+    if len(modtype) > 0:
+      line = input.splitlines()
+      nlines = len(line)
+      for iline in range(nlines):
+        if re.match("^  TreeNet Results$", line[iline]):
+          found = False
+          while iline < nlines and not re.match("^ Loss Function:", line[iline]):
+            iline = iline + 1
+          if found:
+            found = False
+            while iline < nlines and not re.match("^ -+", line[iline]):
+              iline = iline + 1
+            if found:
+              iline = iline + 1
+              perfstat = []
+              parts = line[iline].ljust().split()
+              for part in parts:
+                perfstat.append(re.sub("-",""))
+              iline = iline + 3
+              ntrees = []
+              while iline < nlines and len(line[iline]) > 0:
+                parts = line[iline].ljust().split()
+                nt = parts.pop(0)
+                ntrees.append(nt)
+                for statname in perfstat:
+                  learnstat = parts.pop(0)
+                  teststat = parts.pop(0)
+                  stat[(nt, statname, "Learn")] = parts.pop(0)
+                  stat[(nt, statname, "Test")] = parts.pop(0)
+    return output
+
   def do_execute_direct(self, code, silent=False):
     """Execute the code in the subprocess.
     """
@@ -388,6 +424,7 @@ class SPMKernel(ProcessMetaKernel):
     translate = False     # Set to True if handling a translation
     auto_summary = False  # Set to True if processing an $AUTOSUM statement
     nvar_show = 5         # Maximum number of predictor variables to list for a given shave step
+    sequence = False      # Set to True if generating a sequence report
 
     # Handle plot settings first time through
     if self._first:
@@ -421,6 +458,12 @@ class SPMKernel(ProcessMetaKernel):
       tmpname = tmpfile.name
       tmpfile.close()
       code = "translate language=classic output='"+tmpname+"'"
+    elif re.match("(?i)^ *\$SEQUENCE", code): # Model sequence report requested
+      sequence = True
+      tmpfile = tempfile.NamedTemporaryFile(delete=False)
+      tmpname = tmpfile.name
+      tmpfile.close()
+      code = "translate language=classic output='"+tmpname+"'"
 
     if not code.strip():
       self.kernel_resp = {
@@ -434,7 +477,7 @@ class SPMKernel(ProcessMetaKernel):
     # Here, we process the statement(s)
     interrupted = False
     output = ''
-    if varimp or translate or auto_summary or not __echo__:
+    if varimp or translate or auto_summary or sequence or not __echo__:
         stream_handler = None
     else:
       stream_handler = self.Print if not silent else None
@@ -493,6 +536,11 @@ class SPMKernel(ProcessMetaKernel):
         else:
           output = "Automate summary table not present.  Did you run an AUTOMATE?"
       os.remove(tmpname)
+    elif sequence: # Generate and display sequence report, if appropriate
+      if "*ERROR*" not in output:
+        with open(tmpname) as fd:
+          trans = fd.read()
+        output = self.display_sequence(trans)
     elif translate and len(output) > 0:
       try:
         if "SPMPlots" in output:
