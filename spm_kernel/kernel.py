@@ -79,7 +79,7 @@ class SPMKernel(ProcessMetaKernel):
     MetaKernel.__init__(self, *args, **kwargs)
     self.wrapper = None
     self.wrapper = self.makeWrapper()
-    #self.log.setLevel(logging.DEBUG) # Uncomment to show debug writes
+    self.log.setLevel(logging.DEBUG) # Uncomment to show debug writes
 
   # Start SPM session
   def makeWrapper(self):
@@ -385,32 +385,45 @@ class SPMKernel(ProcessMetaKernel):
     if len(modtype) > 0:
       line = input.splitlines()
       nlines = len(line)
+      ntrees = []
+      stat = {}
       for iline in range(nlines):
-        if re.match("^  TreeNet Results$", line[iline]):
+        if re.match("^ TreeNet Results$", line[iline]):
+          perfstat = []
           found = False
-          while iline < nlines and not re.match("^ Loss Function:", line[iline]):
+          while iline < nlines and not found:
+            found = re.match("^ Loss Function:", line[iline])
             iline = iline + 1
           if found:
             found = False
-            while iline < nlines and not re.match("^ -+", line[iline]):
+            while iline < nlines and not found:
               iline = iline + 1
+              found = re.match("^ +-+", line[iline])
             if found:
-              iline = iline + 1
-              perfstat = []
-              parts = line[iline].ljust().split()
+              parts = re.sub("^ +", "", line[iline]).split()
               for part in parts:
-                perfstat.append(re.sub("-",""))
+                perfstat.append(re.sub("-","", part))
               iline = iline + 3
-              ntrees = []
               while iline < nlines and len(line[iline]) > 0:
-                parts = line[iline].ljust().split()
+                parts = re.sub("^ +", "", line[iline]).split()
                 nt = parts.pop(0)
                 ntrees.append(nt)
                 for statname in perfstat:
-                  learnstat = parts.pop(0)
-                  teststat = parts.pop(0)
                   stat[(nt, statname, "Learn")] = parts.pop(0)
                   stat[(nt, statname, "Test")] = parts.pop(0)
+                iline = iline + 1
+      for statname in perfstat:
+        learn = []
+        test = []
+        for nt in ntrees:
+          learn.append(stat[(nt, statname, "Learn")])
+          test.append(stat[(nt, statname, "Test")])
+        fig = plt.figure()
+        plt.plot(ntrees, learn, ntrees, test)
+        plt.title("Model Performance")
+        plt.xlabel("# trees")
+        plt.ylabel(statname)
+        self.display_figure(fig)
     return output
 
   def do_execute_direct(self, code, silent=False):
