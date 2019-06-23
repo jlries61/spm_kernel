@@ -377,6 +377,20 @@ class SPMKernel(ProcessMetaKernel):
         plt.ylabel("Partial Dependency")
         self.display_figure(fig)
 
+  def adjust_ticks(ticks, maxn = 20):
+    nticks=len(ticks)
+    if nticks <= maxn:
+      return ticks
+    newticks = []
+    min = ticks[0]
+    max = ticks[-1]
+    interval = int((max - min) / maxn)
+    tick = 0
+    for i in range(maxn):
+      newticks.append(int(tick).__round__())
+      tick = tick + interval
+    return newticks
+
   def display_sequence(self, input):
     modtype = ""
     output = ""
@@ -420,6 +434,10 @@ class SPMKernel(ProcessMetaKernel):
           test.append(stat[(nt, statname, "Test")])
         fig = plt.figure()
         plt.plot(ntrees, learn, ntrees, test)
+        xticks = plt.xticks()
+        yticks = plt.yticks()
+        plt.xticks(adjust_ticks(xticks))
+        plt.yticks(adjust_ticks(yticks))
         plt.title("Model Performance")
         plt.xlabel("# trees")
         plt.ylabel(statname)
