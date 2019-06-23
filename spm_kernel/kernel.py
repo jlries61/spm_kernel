@@ -37,11 +37,11 @@ class SPMKernel(ProcessMetaKernel):
                    'codemirror_mode': 'shell',
                    'mimetype': 'text/x-sh',
                    'file_extension': '.cmd'}
-  kernel_json = {"argv": ["python3", "-m", "spm_kernel",
+  kernel_json = {"argv": [sys_executable, "-m", "spm_kernel",
                           "-f", "{connection_file}"],
                  "display_name": "SPM",
                  "language": "SPM"}
-  
+
   _first = True
   inline_plotting = True
 
