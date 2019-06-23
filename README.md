@@ -1,5 +1,5 @@
 # spm_kernel
-Jupyter kernel for Salford Predictive Miner (SPM)
+Jupyter kernel for Salford Predictive Modeler (SPM)
 
 The SPM kernel provides a way to conduct analyses in SPM from the comfort of
 one's own web browser.
@@ -20,6 +20,11 @@ one's own web browser.
   part of most Linux distributions, so if you plan to run under Linux,
   you can probably use your distribution's package manager to install
   Python 3 if it is not installed already.
+
+* Prerequisite Python packages.  These will be installed automatically
+  when you install spm-kernel, but you'll probably want to install them
+  at the system level instead of the user level if you can.  The list
+  includes `IPython`, `pexpect`, `xmltodict`, `numpy`, `pandas`, and `matplotlib`.
 
 * Jupyter (<https://jupyter.org/>).
 
@@ -65,6 +70,12 @@ Add the `--user` flag after `install`, if needed.
     Or copy and paste one of these URLs:
         http://localhost:8888/?token=d52a084d6494bf65eba6731b51da81c03405b3b9f4d5f59f
   ```
+  If you do not want a browser session to start automatically, then specify the `--no-browser` flag.
+  
+  If you want the server to be accessible to external clients, then specify the IP address to which
+  you want clients to connect with the `--ip` flag.  By default, the IP address used is 127.0.0.1
+  (localhost) which is not accessible to external clients.
+
   In Mozilla Firefox, the session will look like this:
   ![](jupyter_session1.png "Jupyter Notebook Session")
 
@@ -119,7 +130,10 @@ Two additional commands are supported as follows:
   one.
 
 * `$AUTOSUM` displays the summary table for the current `AUTOMATE` battery.
-  It has no effect if an `AUTOMATE` battery is not in memory.
+  It has no effect if an `AUTOMATE` battery is not in memory.  On shaving
+  batteries, if more than five predictors are shaved at a time, the number
+  of variables shaved will be displayed, rather than the individual names.
+  This will be made configurable in a future version of spm_kernel.
 
 The SPM kernel inherits its
 [magics](https://ipython.readthedocs.io/en/stable/interactive/magics.html)

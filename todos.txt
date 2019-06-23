@@ -1,0 +1,14 @@
+* Improved GUI displays for main results.
+    Dan: I would like to see a graphic much like the one we produce for TN in
+    SPM when the model first completes -- the performance curve vs number of
+    tree. Also a nice display showing the main performance results ( for
+    classification -- Loglike ROC Misclass Lift in an attractive table.
+    This all automatic.
+
+* Specify the maximum number of variables to display in an AUTOMATE
+  summary
+
+* Properly render two-way partial dependency plots and make them optional.
+
+* On AUTOMATE ADDITIVE, AUTOMATE STEPWISE, and AUTOMATE SHAVING ERROR,
+  include the progress reports with the summary tables.
