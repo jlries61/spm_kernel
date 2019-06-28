@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this module.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 from IPython.display import Image, SVG
 from IPython.display import display, HTML
 from metakernel import MetaKernel, ProcessMetaKernel, pexpect, u
@@ -59,7 +60,7 @@ class SPMKernel(ProcessMetaKernel):
                    'file_extension': '.cmd'}
   # The following is installed into Jupyter as SPM/kernel.json
   # The name element must be defined in order for the installer to work correctly
-  kernel_json = {"argv": [sys_executable, "-m", "spm_kernel",
+  kernel_json = {"argv": [sys.executable, "-m", "spm_kernel",
                           "-f", "{connection_file}"],
                  "display_name": "SPM",
                  "language": "SPM"}
