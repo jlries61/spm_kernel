@@ -59,7 +59,7 @@ class SPMKernel(ProcessMetaKernel):
                    'file_extension': '.cmd'}
   # The following is installed into Jupyter as SPM/kernel.json
   # The name element must be defined in order for the installer to work correctly
-  kernel_json = {"argv": [sys_executable, "-m", "spm_kernel",
+  kernel_json = {"argv": [sys.executable, "-m", "spm_kernel",
                           "-f", "{connection_file}"],
                  "display_name": "SPM",
                  "language": "SPM"}
