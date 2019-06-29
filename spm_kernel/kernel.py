@@ -573,6 +573,10 @@ class SPMKernel(ProcessMetaKernel):
       if "*ERROR*" not in output:
         with open(tmpname) as fd:
           trans = fd.read()
+          if self.display_table(trans, "Learn and Test Performance$"):
+            pass
+          elif self.display_table(trans, "Model Performance$"):
+            pass
         output = self.display_sequence(trans)
     elif translate and len(output) > 0:
       try:
