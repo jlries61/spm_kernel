@@ -127,7 +127,8 @@ class SPMKernel(ProcessMetaKernel):
     title = ""
     for line in inline:
       if re.search(pattern, line):
-        if iline > 0 and re.search("^ =+$", inline[iline - 1]) and re.search("^ =+$", inline[iline + 1]):
+        if iline > 0 and re.search("^ =+$", inline[iline - 1]) and \
+           re.search("^ =+$", inline[iline + 1]):
           title = line
           found = True
           break
@@ -422,10 +423,10 @@ class SPMKernel(ProcessMetaKernel):
               parts = re.sub("^ +", "", line[iline]).split()
               nt = int(parts.pop(0)) # Number of trees
               ntrees.append(nt)
-              for statname in perfstat:
-                stat[(nt, statname, "Learn")] = float(parts.pop(0))
+              for name in perfstat:
+                stat[(nt, name, "Learn")] = float(parts.pop(0))
                 if use_test_sample:
-                  stat[(nt, statname, "Test")] = float(parts.pop(0))
+                  stat[(nt, name, "Test")] = float(parts.pop(0))
               iline = iline + 1
         if re.match("^ Learn and Test Performance$", line[iline]) or \
            re.match("^ Model Performance$", line[iline]):
@@ -449,23 +450,23 @@ class SPMKernel(ProcessMetaKernel):
               stat[(nt, statname[i], sample[i])] = float(parts[i])
             iline = iline + 1
       # Generate plots
-      for statname in perfstat:
+      for name in perfstat:
         learn = []
         test = []
         ntrees2 = []
         for nt in ntrees:
-          if (nt, statname, "Learn") in stat:
+          if (nt, name, "Learn") in stat:
             ntrees2.append(nt)
-            learn.append(stat[(nt, statname, "Learn")])
+            learn.append(stat[(nt, name, "Learn")])
             if use_test_sample:
-              test.append(stat[(nt, statname, "Test")])
+              test.append(stat[(nt, name, "Test")])
         fig = plt.figure()
         plt.plot(ntrees2, learn, label="Learn")
         if use_test_sample:
           plt.plot(ntrees2, test, label="Test")
         plt.title("Model Performance")
         plt.xlabel("# trees")
-        plt.ylabel(statname)
+        plt.ylabel(name)
         plt.legend()
         self.display_figure(fig)
     return output
