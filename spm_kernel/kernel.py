@@ -394,7 +394,7 @@ class SPMKernel(ProcessMetaKernel):
       # Read input line by line
       for iline in range(nlines):
         if re.match("^ TreeNet Results$", line[iline]):
-          perfstat = [] # List of performance stat types
+          perfstat = set() # Set of performance stat types
           found = False
           # First, find the loss function line
           while iline < nlines and not found:
@@ -406,7 +406,7 @@ class SPMKernel(ProcessMetaKernel):
             if use_test_sample:
               parts = re.sub("^ +", "", line[iline]).split()
               for part in parts:
-                perfstat.append(re.sub("-","", part))
+                perfstat.add(re.sub("-","", part))
               iline = iline + 3
             else: # Exploratory model
               iline = iline + 1
@@ -415,7 +415,7 @@ class SPMKernel(ProcessMetaKernel):
               if timing_enabled: # We have one more column to deal with
                 lastind = lastind + 1
               for ipart in range(2, len(part) - lastind):
-                perfstat.append(part[ipart])
+                perfstat.add(part[ipart])
               iline = iline + 2
             # Now parse the model sequence table
             while iline < nlines and len(line[iline]) > 0:
