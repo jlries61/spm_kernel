@@ -383,6 +383,7 @@ class SPMKernel(ProcessMetaKernel):
     # Currently, only TreeNet is supported
     modtype = ""
     output = ""
+    timing_enabled = "Time/Tree" in input
     if "TreeNet Results" in input:
       modtype = "TreeNet"
     if len(modtype) > 0:
@@ -410,7 +411,10 @@ class SPMKernel(ProcessMetaKernel):
             else: # Exploratory model
               iline = iline + 1
               part = line[iline].split()
-              for ipart in range(2, len(part) - 3):
+              lastind = 2
+              if timing_enabled: # We have one more column to deal with
+                lastind = lastind + 1
+              for ipart in range(2, len(part) - lastind):
                 perfstat.append(part[ipart])
               iline = iline + 2
             # Now parse the model sequence table
