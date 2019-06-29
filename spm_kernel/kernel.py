@@ -578,6 +578,7 @@ class SPMKernel(ProcessMetaKernel):
           elif self.display_table(trans, "Model Performance$"):
             pass
         output = self.display_sequence(trans)
+      os.remove(tmpname)
     elif translate and len(output) > 0:
       try:
         if "SPMPlots" in output:
