@@ -45,5 +45,5 @@ setup(
   license="GPLv3",
   packages=["spm_kernel"],
   install_requires=["IPython", "metakernel", "xmltodict", "numpy", "pandas",
-                    "matplotlib", "pexpect"]
+                    "matplotlib", "pexpect", "ordered-set"]
   )

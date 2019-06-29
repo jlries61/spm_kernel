@@ -24,7 +24,8 @@ one's own web browser.
 * Prerequisite Python packages.  These will be installed automatically
   when you install spm-kernel, but you'll probably want to install them
   at the system level instead of the user level if you can.  The list
-  includes `IPython`, `pexpect`, `xmltodict`, `numpy`, `pandas`, and `matplotlib`.
+  includes `IPython`, `pexpect`, `xmltodict`, `numpy`, `pandas`, `matplotlib`,
+  and `ordered_set`.
 
 * Jupyter (<https://jupyter.org/>).
 
@@ -71,7 +72,7 @@ Add the `--user` flag after `install`, if needed.
         http://localhost:8888/?token=d52a084d6494bf65eba6731b51da81c03405b3b9f4d5f59f
   ```
   If you do not want a browser session to start automatically, then specify the `--no-browser` flag.
-  
+
   If you want the server to be accessible to external clients, then specify the IP address to which
   you want clients to connect with the `--ip` flag.  By default, the IP address used is 127.0.0.1
   (localhost) which is not accessible to external clients.

@@ -32,6 +32,7 @@ import logging
 from base64 import b64encode
 import tempfile
 from pexpect import EOF
+from ordered_set import OrderedSet
 
 from spm_kernel.version import __version__
 
@@ -395,7 +396,7 @@ class SPMKernel(ProcessMetaKernel):
       # Read input line by line
       for iline in range(nlines):
         if re.match("^ TreeNet Results$", line[iline]):
-          perfstat = set() # Set of performance stat types
+          perfstat = OrderedSet() # Set of performance stat types
           found = False
           # First, find the loss function line
           while iline < nlines and not found:
