@@ -80,7 +80,7 @@ class SPMKernel(ProcessMetaKernel):
     MetaKernel.__init__(self, *args, **kwargs)
     self.wrapper = None
     self.wrapper = self.makeWrapper()
-    self.log.setLevel(logging.DEBUG) # Uncomment to show debug writes
+    #self.log.setLevel(logging.DEBUG) # Uncomment to show debug writes
 
   # Start SPM session
   def makeWrapper(self):
@@ -378,20 +378,6 @@ class SPMKernel(ProcessMetaKernel):
         plt.ylabel("Partial Dependency")
         self.display_figure(fig)
 
-  def adjust_ticks(ticks, maxn = 20):
-    nticks=len(ticks)
-    if nticks <= maxn:
-      return ticks
-    newticks = []
-    min = ticks[0]
-    max = ticks[-1]
-    interval = int((max - min) / maxn)
-    tick = 0
-    for i in range(maxn):
-      newticks.append(int(tick).__round__())
-      tick = tick + interval
-    return newticks
-
   def display_sequence(self, input):
     modtype = ""
     output = ""
@@ -421,11 +407,11 @@ class SPMKernel(ProcessMetaKernel):
               iline = iline + 3
               while iline < nlines and len(line[iline]) > 0:
                 parts = re.sub("^ +", "", line[iline]).split()
-                nt = parts.pop(0)
+                nt = int(parts.pop(0))
                 ntrees.append(nt)
                 for statname in perfstat:
-                  stat[(nt, statname, "Learn")] = parts.pop(0)
-                  stat[(nt, statname, "Test")] = parts.pop(0)
+                  stat[(nt, statname, "Learn")] = float(parts.pop(0))
+                  stat[(nt, statname, "Test")] = float(parts.pop(0))
                 iline = iline + 1
       for statname in perfstat:
         learn = []
@@ -434,14 +420,12 @@ class SPMKernel(ProcessMetaKernel):
           learn.append(stat[(nt, statname, "Learn")])
           test.append(stat[(nt, statname, "Test")])
         fig = plt.figure()
-        plt.plot(ntrees, learn, ntrees, test)
-        xticks = plt.xticks()
-        yticks = plt.yticks()
-        plt.xticks(adjust_ticks(xticks))
-        plt.yticks(adjust_ticks(yticks))
+        plt.plot(ntrees, learn, label="Learn")
+        plt.plot(ntrees, test, label="Test")
         plt.title("Model Performance")
         plt.xlabel("# trees")
         plt.ylabel(statname)
+        plt.legend()
         self.display_figure(fig)
     return output
 
