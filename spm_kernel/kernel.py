@@ -427,18 +427,42 @@ class SPMKernel(ProcessMetaKernel):
                 if use_test_sample:
                   stat[(nt, statname, "Test")] = float(parts.pop(0))
               iline = iline + 1
+        if re.match("^ Learn and Test Performance$", line[iline]) or \
+           re.match("^ Model Performance$", line[iline]):
+          for i in range(2):
+            iline = iline + 1
+            while not re.match("^ -+$", line[iline]):
+              iline = iline + 1
+          statname = line[iline-2].lstrip().split()
+          sample = line[iline-1].lstrip().split()
+          head1 = sample.pop(0)
+          iline = iline + 1
+          for name in statname:
+            perfstat.add(name)
+          for i in range(len(sample)):
+            if sample[i] == "Test/CV":
+              sample[i] = "Test"
+          while iline < nlines and len(line[iline]) > 0:
+            parts = re.sub("^ +", "", line[iline]).split()
+            nt = int(parts.pop(0)) # Number of trees
+            for i in range(len(statname)):
+              stat[(nt, statname[i], sample[i])] = float(parts[i])
+            iline = iline + 1
       # Generate plots
       for statname in perfstat:
         learn = []
         test = []
+        ntrees2 = []
         for nt in ntrees:
-          learn.append(stat[(nt, statname, "Learn")])
-          if use_test_sample:
-            test.append(stat[(nt, statname, "Test")])
+          if (nt, statname, "Learn") in stat:
+            ntrees2.append(nt)
+            learn.append(stat[(nt, statname, "Learn")])
+            if use_test_sample:
+              test.append(stat[(nt, statname, "Test")])
         fig = plt.figure()
-        plt.plot(ntrees, learn, label="Learn")
+        plt.plot(ntrees2, learn, label="Learn")
         if use_test_sample:
-          plt.plot(ntrees, test, label="Test")
+          plt.plot(ntrees2, test, label="Test")
         plt.title("Model Performance")
         plt.xlabel("# trees")
         plt.ylabel(statname)
