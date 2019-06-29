@@ -398,38 +398,43 @@ class SPMKernel(ProcessMetaKernel):
           # First, find the loss function line
           while iline < nlines and not found:
             found = re.match("^ Loss Function:", line[iline])
-            iline = iline + 1
+            iline = iline + 2
           if found:
-            # Then look for the dashed line
-            found = False
-            while iline < nlines and not found:
-              iline = iline + 1
-              found = re.match("^ +-+", line[iline])
-            if found:
-              # Now compile the list of performance stats to plot
+            use_test_sample = "Train" not in line[iline]
+            # Compile the list of performance stats to plot
+            if use_test_sample:
               parts = re.sub("^ +", "", line[iline]).split()
               for part in parts:
                 perfstat.append(re.sub("-","", part))
               iline = iline + 3
-              # Now parse the model sequence table
-              while iline < nlines and len(line[iline]) > 0:
-                parts = re.sub("^ +", "", line[iline]).split()
-                nt = int(parts.pop(0)) # Number of trees
-                ntrees.append(nt)
-                for statname in perfstat:
-                  stat[(nt, statname, "Learn")] = float(parts.pop(0))
+            else: # Exploratory model
+              iline = iline + 1
+              part = line[iline].split()
+              for ipart in range(2, len(part) - 3):
+                perfstat.append(part[ipart])
+              iline = iline + 2
+            # Now parse the model sequence table
+            while iline < nlines and len(line[iline]) > 0:
+              parts = re.sub("^ +", "", line[iline]).split()
+              nt = int(parts.pop(0)) # Number of trees
+              ntrees.append(nt)
+              for statname in perfstat:
+                stat[(nt, statname, "Learn")] = float(parts.pop(0))
+                if use_test_sample:
                   stat[(nt, statname, "Test")] = float(parts.pop(0))
-                iline = iline + 1
+              iline = iline + 1
       # Generate plots
       for statname in perfstat:
         learn = []
         test = []
         for nt in ntrees:
           learn.append(stat[(nt, statname, "Learn")])
-          test.append(stat[(nt, statname, "Test")])
+          if use_test_sample:
+            test.append(stat[(nt, statname, "Test")])
         fig = plt.figure()
         plt.plot(ntrees, learn, label="Learn")
-        plt.plot(ntrees, test, label="Test")
+        if use_test_sample:
+          plt.plot(ntrees, test, label="Test")
         plt.title("Model Performance")
         plt.xlabel("# trees")
         plt.ylabel(statname)
