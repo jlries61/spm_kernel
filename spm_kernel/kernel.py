@@ -379,40 +379,48 @@ class SPMKernel(ProcessMetaKernel):
         self.display_figure(fig)
 
   def display_sequence(self, input):
+    # Plot performance stats for a model sequence
+    # Currently, only TreeNet is supported
     modtype = ""
     output = ""
     if "TreeNet Results" in input:
       modtype = "TreeNet"
     if len(modtype) > 0:
-      line = input.splitlines()
-      nlines = len(line)
-      ntrees = []
-      stat = {}
+      line = input.splitlines() # Split input into lines
+      nlines = len(line)        # Number of lines in input
+      ntrees = []               # List of numbers of trees
+      stat = {}                 # Dictionary of performance stats
+      # Read input line by line
       for iline in range(nlines):
         if re.match("^ TreeNet Results$", line[iline]):
-          perfstat = []
+          perfstat = [] # List of performance stat types
           found = False
+          # First, find the loss function line
           while iline < nlines and not found:
             found = re.match("^ Loss Function:", line[iline])
             iline = iline + 1
           if found:
+            # Then look for the dashed line
             found = False
             while iline < nlines and not found:
               iline = iline + 1
               found = re.match("^ +-+", line[iline])
             if found:
+              # Now compile the list of performance stats to plot
               parts = re.sub("^ +", "", line[iline]).split()
               for part in parts:
                 perfstat.append(re.sub("-","", part))
               iline = iline + 3
+              # Now parse the model sequence table
               while iline < nlines and len(line[iline]) > 0:
                 parts = re.sub("^ +", "", line[iline]).split()
-                nt = int(parts.pop(0))
+                nt = int(parts.pop(0)) # Number of trees
                 ntrees.append(nt)
                 for statname in perfstat:
                   stat[(nt, statname, "Learn")] = float(parts.pop(0))
                   stat[(nt, statname, "Test")] = float(parts.pop(0))
                 iline = iline + 1
+      # Generate plots
       for statname in perfstat:
         learn = []
         test = []
