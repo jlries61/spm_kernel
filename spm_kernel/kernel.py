@@ -401,7 +401,9 @@ class SPMKernel(ProcessMetaKernel):
           # First, find the loss function line
           while iline < nlines and not found:
             found = re.match("^ Loss Function:", line[iline])
-            iline = iline + 2
+            iline = iline + 1
+          while iline < nlines and len(line[iline]) == 0:
+            iline = iline + 1
           if found:
             use_test_sample = "Train" not in line[iline]
             # Compile the list of performance stats to plot
