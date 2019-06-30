@@ -443,11 +443,13 @@ class SPMKernel(ProcessMetaKernel):
           sample = line[iline-1].lstrip().split()
           head1 = sample.pop(0)
           iline = iline + 1
-          for name in statname:
-            perfstat.add(name)
           for i in range(len(sample)):
             if sample[i] == "Test/CV":
               sample[i] = "Test"
+            if statname[i] == "Class.Error":
+              statname[i] = "CLASS"
+          for name in statname:
+            perfstat.add(name)
           while iline < nlines and len(line[iline]) > 0:
             parts = re.sub("^ +", "", line[iline]).split()
             nt = int(parts.pop(0)) # Number of trees
@@ -604,6 +606,8 @@ class SPMKernel(ProcessMetaKernel):
         with open(tmpname) as fd:
           trans = fd.read()
           if self.display_table(trans, "Learn and Test Performance$"):
+            pass
+          elif self.display_table(trans, "Learn and Cross Validation Performance$"):
             pass
           elif self.display_table(trans, "Model Performance$"):
             pass
