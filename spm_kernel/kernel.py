@@ -419,7 +419,9 @@ class SPMKernel(ProcessMetaKernel):
               if timing_enabled: # We have one more column to deal with
                 lastind = lastind + 1
               for ipart in range(2, len(part) - lastind):
-                perfstat.add(part[ipart])
+                name = part[ipart]
+                if name != "Fract":
+                  perfstat.add(part[ipart])
               iline = iline + 2
             # Now parse the model sequence table
             while iline < nlines and len(line[iline]) > 0:
