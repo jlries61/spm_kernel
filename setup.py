@@ -44,6 +44,7 @@ setup(
   author_email="john@theyarnbard.com",
   license="GPLv3",
   packages=["spm_kernel"],
+  requires_python=">=3.6",
   install_requires=["IPython", "metakernel", "xmltodict", "numpy", "pandas",
                     "matplotlib", "pexpect", "ordered-set"]
   )
