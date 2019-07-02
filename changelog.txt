@@ -1,3 +1,7 @@
+1.0.3 Add new $SEQUENCE command (currently supported only for single TreeNet models).
+
+1.0.2: Repairs required to run under OSX (bugs should have broken the Linux port too).
+
 1.0.1: In AUTOMATE summary tables, if more than five variable names are listed
        in a cell, then replace the names with a count of the number of
        variables.
