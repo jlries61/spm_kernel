@@ -136,6 +136,14 @@ Two additional commands are supported as follows:
   of variables shaved will be displayed, rather than the individual names.
   This will be made configurable in a future version of spm_kernel.
 
+* `$SUMMARY` displays first a table showing the best performance statisics for each subset of the
+  current model (where applicable) followed by plots of each tracked performance statistic by subset
+  size.  This is currently only supported for single TreeNet models.  Here is an example table:
+  ![](seq_table1.png).
+
+And here is an example plot:
+![](AveLL_plot.png)
+
 The SPM kernel inherits its
 [magics](https://ipython.readthedocs.io/en/stable/interactive/magics.html)
 from the [Metakernel](https://github.com/Calysto/metakernel) on which it is
