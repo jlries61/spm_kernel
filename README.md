@@ -122,7 +122,7 @@ SPM's internal command reference is available via the `HELP` command.
 The web-based documentation for SPM can be accessed at
 <https://www.salford-systems.com/support/spm-user-guide/help>.
 
-Two additional commands are supported as follows:
+Three additional commands are supported as follows:
 
 * `$VARIMP` will display the variable importance report from the most
   current model or `AUTOMATE` battery in the form of a bar graph.
