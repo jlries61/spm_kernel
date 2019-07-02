@@ -447,7 +447,10 @@ class SPMKernel(ProcessMetaKernel):
             if sample[i] == "Test/CV":
               sample[i] = "Test"
             if statname[i] == "Class.Error":
-              statname[i] = "CLASS"
+              if "Class" in perfstat:
+                statname[i] = "Class"
+              else:
+                statname[i] = "CLASS"
           for name in statname:
             perfstat.add(name)
           while iline < nlines and len(line[iline]) > 0:
