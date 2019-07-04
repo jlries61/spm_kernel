@@ -349,13 +349,16 @@ class SPMKernel(ProcessMetaKernel):
       ncoord = int(plot["@NCoordinates"])  # Number of coordinates
       coord = plot["Coordinate"]           # List of coordinates
       if plottype == "TreeNet Single Plot":
-        dpvname=coord[1]["@Name"]          # Target variable name
-        predname=coord[0]["@Name"]         # Predictor name
-        predtype=datatype[predname]        # Predictor type
-        dpvtype=datatype[dpvname]          # Target variable type
-        data=plot["Data"]                  # Plot data
-        datalines=data.splitlines()        # We split it into an array of lines
-        nrecords = len(datalines)          # Number of records
+        dpvname = coord[1]["@Name"]          # Target variable name
+        predname = coord[0]["@Name"]         # Predictor name
+        predtype = datatype[predname]        # Predictor type
+        dpvtype = datatype[dpvname]          # Target variable type
+        data = plot["Data"]                  # Plot data
+        datalines = data.splitlines()        # We split it into an array of lines
+        nrecords = len(datalines)            # Number of records
+        level = ""                           # Target class
+        if optype[dpvname] == "categorical": # Categorical target
+          level = coord[1]["@Level"]
         # Parse data lines into cells
         values = []
         for line in datalines:
@@ -372,16 +375,19 @@ class SPMKernel(ProcessMetaKernel):
               values[row][col] = float(values[row][col])
             if values[row][col] == -1e+36:
               values[row][col] = np.NaN
-          pred.append(values[row][0]) # Predictor values
+          pred.append(values[row][0])     # Predictor values
           part_dep.append(values[row][1]) # Partial dependencies
-          actual.append(values[row][2]) # Actual values, if present (can probably be abolished)
+          actual.append(values[row][2])   # Actual values, if present (can probably be abolished)
         # Generate and display figure
+        title = "TreeNet Partial Dependency Plot"
+        if len(level) > 0:
+          title = title + " (" + dpvname + " = " + level + ")"
         fig=plt.figure()
         if optype[predname] == "continuous": # We generate a line graph
           plt.plot(pred, part_dep)
         else: # We generate a bar chart
           plt.bar(pred, part_dep, tick_label=cat[predname])
-        plt.title("TreeNet Partial Dependency Plot")
+        plt.title(title)
         plt.xlabel(predname)
         plt.ylabel("Partial Dependency")
         self.display_figure(fig)
