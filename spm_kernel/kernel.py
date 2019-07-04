@@ -365,7 +365,6 @@ class SPMKernel(ProcessMetaKernel):
           values.append(line.split(","))
         pred = []
         part_dep = []
-        actual = []
         for row in range(nrecords):
           for col in range(ncoord):
             name = coord[col]["@Name"]
@@ -373,11 +372,10 @@ class SPMKernel(ProcessMetaKernel):
             if (interp == "PartialDependence" or datatype[name] == "float") and \
                len(values[row][col]) > 0:
               values[row][col] = float(values[row][col])
-            if values[row][col] == -1e+36:
+            if values[row][col] == -1e+36: #SPM missing value code
               values[row][col] = np.NaN
           pred.append(values[row][0])     # Predictor values
           part_dep.append(values[row][1]) # Partial dependencies
-          actual.append(values[row][2])   # Actual values, if present (can probably be abolished)
         # Generate and display figure
         title = "TreeNet Partial Dependency Plot"
         if len(level) > 0:
