@@ -355,20 +355,26 @@ class SPMKernel(ProcessMetaKernel):
         dpvtype=datatype[dpvname]          # Target variable type
         data=plot["Data"]                  # Plot data
         datalines=data.splitlines()        # We split it into an array of lines
+        nrecords = len(datalines)          # Number of records
         # Parse data lines into cells
         values = []
         for line in datalines:
           values.append(line.split(","))
+        pred = []
+        part_dep = []
+        actual = []
         for row in range(nrecords):
           for col in range(ncoord):
             name = coord[col]["@Name"]
             interp = coord[col]["@Interpretation"]
-            if interp == "PartialDependence" or datatype[name] == "float":
-              values[row][col]=float(values[row][col])
-        valmat=np.array(values) # Turn values into a NumPy array
-        pred=valmat[ : , 0]     # Predictor values
-        part_dep=valmat[ : , 1] # Partial dependencies
-        actual=valmat[ : , 2]   # Actual values, if present (can probably be abolished)
+            if (interp == "PartialDependence" or datatype[name] == "float") and \
+               len(values[row][col]) > 0:
+              values[row][col] = float(values[row][col])
+            if values[row][col] == -1e+36:
+              values[row][col] = np.NaN
+          pred.append(values[row][0]) # Predictor values
+          part_dep.append(values[row][1]) # Partial dependencies
+          actual.append(values[row][2]) # Actual values, if present (can probably be abolished)
         # Generate and display figure
         fig=plt.figure()
         if optype[predname] == "continuous": # We generate a line graph
