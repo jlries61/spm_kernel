@@ -1,3 +1,5 @@
+1.0.4 Repair partial dependency plots (make sure numeric data are interpreted as numeric).
+
 1.0.3 Add new $SEQUENCE command (currently supported only for single TreeNet models).
 
 1.0.2: Repairs required to run under OSX (bugs should have broken the Linux port too).
