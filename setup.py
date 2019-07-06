@@ -37,8 +37,6 @@ setup(
   name = "spm_kernel",
   version = __version__,
   description = "Jupyter kernel for Salford Predictive Miner (SPM)",
-  long_description=README,
-  long_description_content_type="text/markdown",
   url="https://github.com/jlries61/spm_kernel",
   author="John L. Ries",
   author_email="john@theyarnbard.com",
