@@ -499,10 +499,10 @@ class SPMKernel(ProcessMetaKernel):
     child = wrapper.child
     varimp = False        # Set to True if processing a $VARIMP statement
     global __echo__       # We're using the global version of __echo__
-    translate = False     # Set to True if handling a translation
     auto_summary = False  # Set to True if processing an $AUTOSUM statement
     nvar_show = 5         # Maximum number of predictor variables to list for a given shave step
     sequence = False      # Set to True if generating a sequence report
+    pdplots = False       #Set to True if generating partial dependency plots
 
     # Handle plot settings first time through
     if self._first:
@@ -528,7 +528,12 @@ class SPMKernel(ProcessMetaKernel):
       code = "translate language=pmml output='"+tmpname+"'"
       varimp = True
     elif re.match("(?i)^ *TRA", code): # TRANSLATE statement requires special handling
-      translate = True
+      if re.search("(?i)language *= *plot", code) and not re.search("(?i)output *=", code):
+        pdplots = True
+        tmpfile = tempfile.NamedTemporaryFile(delete=False)
+        tmpname = tmpfile.name
+        tmpfile.close()
+        code = code + " output ='"+tmpname+"'"
     elif re.match("(?i)^ *\$AUTOSUM", code): # AUTOMATE summary requested
       # We extract the table from Classic/Translate output for the convenience of the programmer.
       auto_summary = True
@@ -555,7 +560,7 @@ class SPMKernel(ProcessMetaKernel):
     # Here, we process the statement(s)
     interrupted = False
     output = ''
-    if varimp or translate or auto_summary or sequence or not __echo__:
+    if varimp or auto_summary or sequence or not __echo__:
         stream_handler = None
     else:
       stream_handler = self.Print if not silent else None
@@ -618,24 +623,25 @@ class SPMKernel(ProcessMetaKernel):
       if "*ERROR*" not in output:
         with open(tmpname) as fd:
           trans = fd.read()
-          if self.display_table(trans, "Learn and Test Performance$"):
-            pass
-          elif self.display_table(trans, "Learn and Cross Validation Performance$"):
-            pass
-          elif self.display_table(trans, "Model Performance$"):
-            pass
+        if self.display_table(trans, "Learn and Test Performance$"):
+          pass
+        elif self.display_table(trans, "Learn and Cross Validation Performance$"):
+          pass
+        elif self.display_table(trans, "Model Performance$"):
+          pass
         output = self.display_sequence(trans)
       os.remove(tmpname)
-    elif translate and len(output) > 0:
-      try:
-        if "SPMPlots" in output:
-          # Display partial dependency plots
-          doc = xmltodict.parse(self.extract(output, "<SPMPlots", "</SPMPlots>"),
-                                disable_entities= False)
+    elif pdplots:
+      with open(tmpname) as fd:
+        trans = fd.read()
+      if "SPMPlots" in trans:
+        try:
+          doc = xmltodict.parse(trans, disable_entities= False)
           self.SPMPlots(doc)
           output = ""
-      except xml.parsers.expat.ExpatError:
-        doc = {}
+        except xml.parsers.expat.ExpatError:
+          doc = {}
+      os.remove(tmpname)
     if __echo__ and output:
       if stream_handler:
         stream_handler(output)
