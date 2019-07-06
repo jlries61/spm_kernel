@@ -1,3 +1,6 @@
+1.0.5: Fix hang that occurs if partial dependency plot data are too large by always writing them
+       to an external file.  This has the added benefit of removing them from the classic output.
+
 1.0.4 Repair partial dependency plots (make sure numeric data are interpreted as numeric).
 
 1.0.3 Add new $SEQUENCE command (currently supported only for single TreeNet models).
