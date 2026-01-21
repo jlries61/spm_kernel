@@ -36,7 +36,7 @@ with io.open("spm_kernel/version.py", encoding='utf-8') as fid:
 setup(
   name = "spm_kernel",
   version = __version__,
-  description = "Jupyter kernel for Salford Predictive Miner (SPM)",
+  description = "Jupyter kernel for Salford Predictive Modeler (SPM)",
   long_description=README,
   long_description_content_type="text/markdown",
   url="https://github.com/jlries61/spm_kernel",
