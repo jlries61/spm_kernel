@@ -349,33 +349,43 @@ class SPMKernel(ProcessMetaKernel):
       ncoord = int(plot["@NCoordinates"])  # Number of coordinates
       coord = plot["Coordinate"]           # List of coordinates
       if plottype == "TreeNet Single Plot":
-        dpvname=coord[1]["@Name"]          # Target variable name
-        predname=coord[0]["@Name"]         # Predictor name
-        predtype=datatype[predname]        # Predictor type
-        dpvtype=datatype[dpvname]          # Target variable type
-        data=plot["Data"]                  # Plot data
-        datalines=data.splitlines()        # We split it into an array of lines
+        dpvname = coord[1]["@Name"]          # Target variable name
+        predname = coord[0]["@Name"]         # Predictor name
+        predtype = datatype[predname]        # Predictor type
+        dpvtype = datatype[dpvname]          # Target variable type
+        data = plot["Data"]                  # Plot data
+        datalines = data.splitlines()        # We split it into an array of lines
+        nrecords = len(datalines)            # Number of records
+        level = ""                           # Target class
+        if optype[dpvname] == "categorical": # Categorical target
+          level = coord[1]["@Level"]
         # Parse data lines into cells
         values = []
         for line in datalines:
           values.append(line.split(","))
+        pred = []
+        part_dep = []
         for row in range(nrecords):
           for col in range(ncoord):
             name = coord[col]["@Name"]
             interp = coord[col]["@Interpretation"]
-            if interp == "PartialDependence" or datatype[name] == "float":
-              values[row][col]=float(values[row][col])
-        valmat=np.array(values) # Turn values into a NumPy array
-        pred=valmat[ : , 0]     # Predictor values
-        part_dep=valmat[ : , 1] # Partial dependencies
-        actual=valmat[ : , 2]   # Actual values, if present (can probably be abolished)
+            if (interp == "PartialDependence" or datatype[name] == "float") and \
+               len(values[row][col]) > 0:
+              values[row][col] = float(values[row][col])
+            if values[row][col] == -1e+36: #SPM missing value code
+              values[row][col] = np.NaN
+          pred.append(values[row][0])     # Predictor values
+          part_dep.append(values[row][1]) # Partial dependencies
         # Generate and display figure
+        title = "TreeNet Partial Dependency Plot"
+        if len(level) > 0:
+          title = title + " (" + dpvname + " = " + level + ")"
         fig=plt.figure()
         if optype[predname] == "continuous": # We generate a line graph
           plt.plot(pred, part_dep)
         else: # We generate a bar chart
           plt.bar(pred, part_dep, tick_label=cat[predname])
-        plt.title("TreeNet Partial Dependency Plot")
+        plt.title(title)
         plt.xlabel(predname)
         plt.ylabel("Partial Dependency")
         self.display_figure(fig)
@@ -489,10 +499,10 @@ class SPMKernel(ProcessMetaKernel):
     child = wrapper.child
     varimp = False        # Set to True if processing a $VARIMP statement
     global __echo__       # We're using the global version of __echo__
-    translate = False     # Set to True if handling a translation
     auto_summary = False  # Set to True if processing an $AUTOSUM statement
     nvar_show = 5         # Maximum number of predictor variables to list for a given shave step
     sequence = False      # Set to True if generating a sequence report
+    pdplots = False       #Set to True if generating partial dependency plots
 
     # Handle plot settings first time through
     if self._first:
@@ -518,7 +528,12 @@ class SPMKernel(ProcessMetaKernel):
       code = "translate language=pmml output='"+tmpname+"'"
       varimp = True
     elif re.match("(?i)^ *TRA", code): # TRANSLATE statement requires special handling
-      translate = True
+      if re.search("(?i)language *= *plot", code) and not re.search("(?i)output *=", code):
+        pdplots = True
+        tmpfile = tempfile.NamedTemporaryFile(delete=False)
+        tmpname = tmpfile.name
+        tmpfile.close()
+        code = code + " output ='"+tmpname+"'"
     elif re.match("(?i)^ *\$AUTOSUM", code): # AUTOMATE summary requested
       # We extract the table from Classic/Translate output for the convenience of the programmer.
       auto_summary = True
@@ -545,7 +560,7 @@ class SPMKernel(ProcessMetaKernel):
     # Here, we process the statement(s)
     interrupted = False
     output = ''
-    if varimp or translate or auto_summary or sequence or not __echo__:
+    if varimp or auto_summary or sequence or not __echo__:
         stream_handler = None
     else:
       stream_handler = self.Print if not silent else None
@@ -608,24 +623,25 @@ class SPMKernel(ProcessMetaKernel):
       if "*ERROR*" not in output:
         with open(tmpname) as fd:
           trans = fd.read()
-          if self.display_table(trans, "Learn and Test Performance$"):
-            pass
-          elif self.display_table(trans, "Learn and Cross Validation Performance$"):
-            pass
-          elif self.display_table(trans, "Model Performance$"):
-            pass
+        if self.display_table(trans, "Learn and Test Performance$"):
+          pass
+        elif self.display_table(trans, "Learn and Cross Validation Performance$"):
+          pass
+        elif self.display_table(trans, "Model Performance$"):
+          pass
         output = self.display_sequence(trans)
       os.remove(tmpname)
-    elif translate and len(output) > 0:
-      try:
-        if "SPMPlots" in output:
-          # Display partial dependency plots
-          doc = xmltodict.parse(self.extract(output, "<SPMPlots", "</SPMPlots>"),
-                                disable_entities= False)
+    elif pdplots:
+      with open(tmpname) as fd:
+        trans = fd.read()
+      if "SPMPlots" in trans:
+        try:
+          doc = xmltodict.parse(trans, disable_entities= False)
           self.SPMPlots(doc)
           output = ""
-      except xml.parsers.expat.ExpatError:
-        doc = {}
+        except xml.parsers.expat.ExpatError:
+          doc = {}
+      os.remove(tmpname)
     if __echo__ and output:
       if stream_handler:
         stream_handler(output)
