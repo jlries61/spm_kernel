@@ -122,7 +122,7 @@ SPM's internal command reference is available via the `HELP` command.
 The web-based documentation for SPM can be accessed at
 <https://www.salford-systems.com/support/spm-user-guide/help>.
 
-Two additional commands are supported as follows:
+Some additional commands are supported as follows:
 
 * `$VARIMP` will display the variable importance report from the most
   current model or `AUTOMATE` battery in the form of a bar graph.
@@ -145,6 +145,11 @@ Two additional commands are supported as follows:
 And here is an example plot:
 
 ![](AveLL_plot.png)
+
+`$SEQUENCE` generates and displays a plot showing the possible sizings
+of a TreeNet model with the performance statistics for the various samples
+(or cross-validation, if appropriate).  Currently supported for TreeNet
+models only.
 
 The SPM kernel inherits its
 [magics](https://ipython.readthedocs.io/en/stable/interactive/magics.html)
